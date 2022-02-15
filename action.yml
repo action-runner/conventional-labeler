@@ -1,0 +1,12 @@
+name: 'Conventional Labeler'
+description: 'A Pull request labeler using conventional commit standard'
+inputs:
+  access_token:
+    description: 'Github Access Token to access and modify your pr's label'
+    required: true
+outputs:
+  labels:
+    description: Generated labels for your pull request.
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
