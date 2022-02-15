@@ -15,15 +15,15 @@ class ConventionalCommit {
     constructor() {
         // map of conventional commit and its corresponding label
         this.map = {
-            feat: "enhancement",
-            fix: "bugfix",
-            docs: "documentation",
-            style: "style",
-            refactor: "refactor",
-            perf: "performance",
-            test: "test",
-            chore: "chore",
-            build: "build",
+            feat: "conventional: enhancement",
+            fix: "conventional: bugfix",
+            docs: "conventional: documentation",
+            style: "conventional: style",
+            refactor: "conventional: refactor",
+            perf: "conventional: performance",
+            test: "conventional: test",
+            chore: "conventional: chore",
+            build: "conventional: build",
         };
     }
     /**
@@ -57,7 +57,7 @@ class ConventionalCommit {
         // validate the commit message
         if (!this.validate(message)) {
             return {
-                error: "Invalid commit message",
+                error: `commit message [${message}] does not follow the conventional commit format`,
             };
         }
         // get the label
@@ -90,6 +90,18 @@ class ConventionalCommit {
             }
         }
         return validLabels;
+    }
+    /**
+     * Given two labels array labels1 and labels2, return the labels that are not in labels2
+     */
+    getDiffLabels(labels, labels2) {
+        const diffLabels = [];
+        for (const label of labels) {
+            if (!labels2.includes(label)) {
+                diffLabels.push(label);
+            }
+        }
+        return diffLabels;
     }
 }
 exports.ConventionalCommit = ConventionalCommit;
@@ -304,47 +316,48 @@ class ConventionalLabeler {
             core.info("Getting PR number");
             const pr = this.githubClient.getPr();
             if (!pr) {
-                core.error("No pull request found");
+                core.setFailed("No pull request found");
                 return;
             }
             // get pr's existing labels
             core.info("Getting PR labels");
             const labels = yield this.githubClient.getLabels(pr);
             if (labels.error) {
-                core.error(labels.error);
-                return;
-            }
-            // get list of preset labels
-            core.info("Getting preset labels");
-            const presetLabels = this.conventionalCommit.getValidLabels((_a = labels.labels) !== null && _a !== void 0 ? _a : []);
-            // remove them
-            core.info("Removing preset labels");
-            const removeError = yield this.githubClient.removeLabels(pr, presetLabels);
-            if (removeError) {
-                core.error(removeError);
+                core.setFailed(labels.error);
                 return;
             }
             // get the pr title
             const title = this.githubClient.getTitle();
             if (!title || title.length === 0) {
-                core.error("Failed to get the pr title");
+                core.setFailed("Failed to get the pr title");
                 return;
             }
             // get the label
-            core.info("Getting conventional label");
-            const label = this.conventionalCommit.getLabel(title);
-            if (label.error) {
-                core.error(label.error);
+            core.info(`Getting conventional label from title ${title}`);
+            const generatedLabel = this.conventionalCommit.getLabel(title);
+            if (generatedLabel.error) {
+                core.setFailed(generatedLabel.error);
+                return;
+            }
+            // get list of preset labels
+            core.info("Getting preset labels");
+            const presetLabels = this.conventionalCommit.getValidLabels((_a = labels.labels) !== null && _a !== void 0 ? _a : []);
+            const differentLabels = this.conventionalCommit.getDiffLabels(presetLabels, [generatedLabel.label]);
+            // remove them
+            core.info("Removing different label");
+            const removeError = yield this.githubClient.removeLabels(pr, differentLabels);
+            if (removeError) {
+                core.setFailed(removeError);
                 return;
             }
             // add the label
-            core.info("Adding label to PR");
-            const error = yield this.githubClient.addLabel(pr, [label.label]);
+            core.info(`Adding label ${generatedLabel.label} to PR`);
+            const error = yield this.githubClient.addLabel(pr, [generatedLabel.label]);
             if (error) {
-                core.error(error);
+                core.setFailed(error);
                 return;
             }
-            core.setOutput("labels", labels.labels);
+            core.setOutput("labels", generatedLabel.label);
         });
     }
 }
