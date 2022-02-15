@@ -44,7 +44,7 @@ describe("Given a labeler client", () => {
     // clear mock calls
     (github.getOctokit as any).mockClear();
     (core.info as any).mockClear();
-    (core.error as any).mockClear();
+    (core.setFailed as any).mockClear();
   });
 
   it("should return the corresponding label for the commit title", async () => {
@@ -67,8 +67,8 @@ describe("Given a labeler client", () => {
       },
     });
     await client.label();
-    expect(core.error).toHaveBeenCalledTimes(1);
-    expect(core.error).toHaveBeenCalledWith("Error: add label error");
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith("Error: add label error");
   });
 
   it("Should remove labels with an error", async () => {
@@ -89,8 +89,8 @@ describe("Given a labeler client", () => {
       },
     });
     await client.label();
-    expect(core.error).toHaveBeenCalledTimes(1);
-    expect(core.error).toHaveBeenCalledWith("Error: remove label error");
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith("Error: remove label error");
   });
 
   it("should return the corresponding label with an error", async () => {
@@ -104,15 +104,15 @@ describe("Given a labeler client", () => {
       },
     });
     await client.label();
-    expect(core.error).toHaveBeenCalledTimes(1);
-    expect(core.error).toHaveBeenCalledWith("Error: issue error");
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith("Error: issue error");
   });
 
   it("should return the pr error", async () => {
     (github as any).context.payload.pull_request!.number = undefined;
     await client.label();
-    expect(core.error).toHaveBeenCalledTimes(1);
-    expect(core.error).toHaveBeenCalledWith("No pull request found");
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith("No pull request found");
   });
 
   it("should return the title error", async () => {
@@ -141,8 +141,8 @@ describe("Given a labeler client", () => {
     };
 
     await client.label();
-    expect(core.error).toHaveBeenCalledTimes(1);
-    expect(core.error).toHaveBeenCalledWith("Failed to get the pr title");
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith("Failed to get the pr title");
   });
 
   it("should return the title error", async () => {
@@ -171,9 +171,9 @@ describe("Given a labeler client", () => {
     };
 
     await client.label();
-    expect(core.error).toHaveBeenCalledTimes(1);
-    expect(core.error).toHaveBeenCalledWith(
-      "commit message does not follow the conventional commit format"
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith(
+      "commit message [hello] does not follow the conventional commit format"
     );
   });
 });

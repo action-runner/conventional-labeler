@@ -20,7 +20,6 @@ export class ConventionalLabeler {
     core.info("Getting PR number");
     const pr = this.githubClient.getPr();
     if (!pr) {
-      core.error("No pull request found");
       core.setFailed("No pull request found");
       return;
     }
@@ -29,7 +28,6 @@ export class ConventionalLabeler {
     core.info("Getting PR labels");
     const labels = await this.githubClient.getLabels(pr);
     if (labels.error) {
-      core.error(labels.error);
       core.setFailed(labels.error);
       return;
     }
@@ -37,7 +35,6 @@ export class ConventionalLabeler {
     // get the pr title
     const title = this.githubClient.getTitle();
     if (!title || title.length === 0) {
-      core.error("Failed to get the pr title");
       core.setFailed("Failed to get the pr title");
       return;
     }
@@ -46,7 +43,6 @@ export class ConventionalLabeler {
     core.info(`Getting conventional label from title ${title}`);
     const generatedLabel = this.conventionalCommit.getLabel(title);
     if (generatedLabel.error) {
-      core.error(generatedLabel.error);
       core.setFailed(generatedLabel.error);
       return;
     }
@@ -69,7 +65,6 @@ export class ConventionalLabeler {
       differentLabels
     );
     if (removeError) {
-      core.error(removeError);
       core.setFailed(removeError);
       return;
     }
@@ -78,7 +73,6 @@ export class ConventionalLabeler {
     core.info(`Adding label ${generatedLabel.label} to PR`);
     const error = await this.githubClient.addLabel(pr, [generatedLabel.label!]);
     if (error) {
-      core.error(error);
       core.setFailed(error);
       return;
     }

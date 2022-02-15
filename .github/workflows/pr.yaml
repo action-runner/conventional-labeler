@@ -11,7 +11,7 @@ on:
 jobs:
   label:
     runs-on: ubuntu-latest
-    name: A job to say hello
+    name: Lint PR
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}

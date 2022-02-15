@@ -50,7 +50,7 @@ export class ConventionalCommit {
     // validate the commit message
     if (!this.validate(message)) {
       return {
-        error: "commit message does not follow the conventional commit format",
+        error: `commit message [${message}] does not follow the conventional commit format`,
       };
     }
 
