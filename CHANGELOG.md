@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/action-runner/conventional-labeler/compare/1.1.1...1.2.0) (2022-02-15)
+
+
+### Features
+
+* will validate commits ([39ee9cd](https://github.com/action-runner/conventional-labeler/commit/39ee9cdb62a1c409d99971ba71c14f468ddc54c1))
+
 ## [1.1.1](https://github.com/action-runner/conventional-labeler/compare/1.1.0...1.1.1) (2022-02-15)
 
 

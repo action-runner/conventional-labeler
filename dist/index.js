@@ -27,9 +27,11 @@ class ConventionalCommit {
         };
     }
     /**
-     * validate the pr title
+     * validate the message
+     * @param message commit message
+     * @returns true if the message is valid, false otherwise
      */
-    validate(message) {
+    validateMessage(message) {
         // list of conventional commit rules
         const rules = [
             {
@@ -55,7 +57,7 @@ class ConventionalCommit {
             return { error: "commit message is empty" };
         }
         // validate the commit message
-        if (!this.validate(message)) {
+        if (!this.validateMessage(message)) {
             return {
                 error: `commit message [${message}] does not follow the conventional commit format`,
             };
@@ -102,6 +104,35 @@ class ConventionalCommit {
             }
         }
         return diffLabels;
+    }
+    /**
+     * Validate commit messages based on the conventional commit format.
+     * The following rules will be applied:
+     * (1): If only one message and it is not equal to the title of the PR, return error
+     * (2): Otherwise, if the message is not in the conventional commit format, return error
+     *
+     * @param messages commit messages
+     * @returns an error message if the commit messages are not valid, otherwise return undefined
+     */
+    validate(messages, title) {
+        // Check if title meets the conventional commit format
+        if (!this.validateMessage(title)) {
+            return `title [${title}] does not follow the conventional commit format`;
+        }
+        if (messages.length === 0) {
+            return `commit message is empty`;
+        }
+        // if there is only one message, check if it is equal to the title of the PR
+        if (messages.length === 1 && messages[0] !== title) {
+            return `commit message [${messages[0]}] does not equal to the title of the PR [${title}]`;
+        }
+        // check if the commit messages are valid
+        for (const message of messages) {
+            if (!this.validateMessage(message)) {
+                return `commit message [${message}] does not follow the conventional commit format`;
+            }
+        }
+        return undefined;
     }
 }
 exports.ConventionalCommit = ConventionalCommit;
@@ -232,6 +263,30 @@ class GithubClient {
         var _a;
         return (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number;
     }
+    /**
+     * Get list of commit messages
+     * @returns The commit messages or an error message
+     */
+    getCommitMessages(prNumber) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const client = github.getOctokit(this.token);
+                const commits = yield client.rest.pulls.listCommits({
+                    repo: github.context.repo.repo,
+                    owner: github.context.repo.owner,
+                    pull_number: prNumber,
+                });
+                return {
+                    commitMessages: commits.data.map((commit) => commit.commit.message),
+                };
+            }
+            catch (e) {
+                return {
+                    err: `${e}`,
+                };
+            }
+        });
+    }
 }
 exports.GithubClient = GithubClient;
 
@@ -332,25 +387,36 @@ class ConventionalLabeler {
                 core.setFailed("Failed to get the pr title");
                 return;
             }
-            // get the label
+            // get list of predefined labels
+            core.info("Getting predefined labels");
+            const predefinedLabels = this.conventionalCommit.getValidLabels((_a = labels.labels) !== null && _a !== void 0 ? _a : []);
+            // validate the commit message and title
+            core.info("Validating commit message and title");
+            const commitMessages = yield this.githubClient.getCommitMessages(pr);
+            if (commitMessages.err) {
+                core.setFailed(commitMessages.err);
+            }
+            const validationError = this.conventionalCommit.validate(commitMessages.commitMessages, title);
+            if (validationError) {
+                core.setFailed(validationError);
+                return;
+            }
+            // get the generated label
             core.info(`Getting conventional label from title ${title}`);
             const generatedLabel = this.conventionalCommit.getLabel(title);
             if (generatedLabel.error) {
                 core.setFailed(generatedLabel.error);
                 return;
             }
-            // get list of preset labels
-            core.info("Getting preset labels");
-            const presetLabels = this.conventionalCommit.getValidLabels((_a = labels.labels) !== null && _a !== void 0 ? _a : []);
-            const differentLabels = this.conventionalCommit.getDiffLabels(presetLabels, [generatedLabel.label]);
-            // remove them
+            const differentLabels = this.conventionalCommit.getDiffLabels(predefinedLabels, [generatedLabel.label]);
+            // remove the labels that are not in the preset labels
             core.info("Removing different label");
             const removeError = yield this.githubClient.removeLabels(pr, differentLabels);
             if (removeError) {
                 core.setFailed(removeError);
                 return;
             }
-            // add the label
+            // add the generated label
             core.info(`Adding label ${generatedLabel.label} to PR`);
             const error = yield this.githubClient.addLabel(pr, [generatedLabel.label]);
             if (error) {
