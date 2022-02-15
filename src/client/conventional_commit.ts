@@ -4,15 +4,15 @@
 export class ConventionalCommit {
   // map of conventional commit and its corresponding label
   map: { [key: string]: string } = {
-    feat: "enhancement",
-    fix: "bugfix",
-    docs: "documentation",
-    style: "style",
-    refactor: "refactor",
-    perf: "performance",
-    test: "test",
-    chore: "chore",
-    build: "build",
+    feat: "conventional: enhancement",
+    fix: "conventional: bugfix",
+    docs: "conventional: documentation",
+    style: "conventional: style",
+    refactor: "conventional: refactor",
+    perf: "conventional: performance",
+    test: "conventional: test",
+    chore: "conventional: chore",
+    build: "conventional: build",
   };
 
   /**
@@ -50,7 +50,7 @@ export class ConventionalCommit {
     // validate the commit message
     if (!this.validate(message)) {
       return {
-        error: "Invalid commit message",
+        error: `commit message [${message}] does not follow the conventional commit format`,
       };
     }
 
@@ -90,5 +90,18 @@ export class ConventionalCommit {
       }
     }
     return validLabels;
+  }
+
+  /**
+   * Given two labels array labels1 and labels2, return the labels that are not in labels2
+   */
+  getDiffLabels(labels: string[], labels2: string[]): string[] {
+    const diffLabels = [];
+    for (const label of labels) {
+      if (!labels2.includes(label)) {
+        diffLabels.push(label);
+      }
+    }
+    return diffLabels;
   }
 }

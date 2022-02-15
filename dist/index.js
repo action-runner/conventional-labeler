@@ -102,6 +102,25 @@ exports.ConventionalCommit = ConventionalCommit;
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -111,12 +130,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GithubClient = void 0;
-const github_1 = __importDefault(__nccwpck_require__(5438));
+const github = __importStar(__nccwpck_require__(5438));
 /**
  * Github client is a wrapper for the Github API.
  */
@@ -126,11 +142,11 @@ class GithubClient {
     }
     addLabel(pr, labels) {
         return __awaiter(this, void 0, void 0, function* () {
-            const client = github_1.default.getOctokit(this.token);
+            const client = github.getOctokit(this.token);
             try {
                 yield client.rest.issues.addLabels({
-                    owner: github_1.default.context.repo.owner,
-                    repo: github_1.default.context.repo.repo,
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
                     issue_number: pr,
                     labels: labels,
                 });
@@ -149,11 +165,11 @@ class GithubClient {
      */
     removeLabels(pr, labels) {
         return __awaiter(this, void 0, void 0, function* () {
-            const client = github_1.default.getOctokit(this.token);
+            const client = github.getOctokit(this.token);
             try {
                 yield Promise.all(labels.map((label) => client.rest.issues.removeLabel({
-                    owner: github_1.default.context.repo.owner,
-                    repo: github_1.default.context.repo.repo,
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
                     issue_number: pr,
                     name: label,
                 })));
@@ -171,10 +187,10 @@ class GithubClient {
     getLabels(pr) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const client = github_1.default.getOctokit(this.token);
+                const client = github.getOctokit(this.token);
                 const labels = yield client.rest.issues.listLabelsOnIssue({
-                    owner: github_1.default.context.repo.owner,
-                    repo: github_1.default.context.repo.repo,
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
                     issue_number: pr,
                 });
                 return {
@@ -193,7 +209,7 @@ class GithubClient {
      */
     getTitle() {
         // use github api to get pr's title
-        const pullRequest = github_1.default.context.payload.pull_request;
+        const pullRequest = github.context.payload.pull_request;
         return pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.title;
     }
     /**
@@ -202,7 +218,7 @@ class GithubClient {
      */
     getPr() {
         var _a;
-        return (_a = github_1.default.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number;
+        return (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number;
     }
 }
 exports.GithubClient = GithubClient;
@@ -239,6 +255,25 @@ const labeler_1 = __nccwpck_require__(8389);
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -248,17 +283,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ConventionalLabeler = void 0;
 const conventional_commit_1 = __nccwpck_require__(6382);
 const github_1 = __nccwpck_require__(3412);
-const core_1 = __importDefault(__nccwpck_require__(2186));
+const core = __importStar(__nccwpck_require__(2186));
 class ConventionalLabeler {
     constructor() {
-        const token = core_1.default.getInput("access_token", { required: true });
+        const token = core.getInput("access_token", { required: true });
         this.githubClient = new github_1.GithubClient(token);
         this.conventionalCommit = new conventional_commit_1.ConventionalCommit();
     }
@@ -269,50 +301,50 @@ class ConventionalLabeler {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             // get pr's number
-            core_1.default.info("Getting PR number");
+            core.info("Getting PR number");
             const pr = this.githubClient.getPr();
             if (!pr) {
-                core_1.default.error("No pull request found");
+                core.error("No pull request found");
                 return;
             }
             // get pr's existing labels
-            core_1.default.info("Getting PR labels");
+            core.info("Getting PR labels");
             const labels = yield this.githubClient.getLabels(pr);
             if (labels.error) {
-                core_1.default.error(labels.error);
+                core.error(labels.error);
                 return;
             }
             // get list of preset labels
-            core_1.default.info("Getting preset labels");
+            core.info("Getting preset labels");
             const presetLabels = this.conventionalCommit.getValidLabels((_a = labels.labels) !== null && _a !== void 0 ? _a : []);
             // remove them
-            core_1.default.info("Removing preset labels");
+            core.info("Removing preset labels");
             const removeError = yield this.githubClient.removeLabels(pr, presetLabels);
             if (removeError) {
-                core_1.default.error(removeError);
+                core.error(removeError);
                 return;
             }
             // get the pr title
             const title = this.githubClient.getTitle();
             if (!title || title.length === 0) {
-                core_1.default.error("Failed to get the pr title");
+                core.error("Failed to get the pr title");
                 return;
             }
             // get the label
-            core_1.default.info("Getting conventional label");
+            core.info("Getting conventional label");
             const label = this.conventionalCommit.getLabel(title);
             if (label.error) {
-                core_1.default.error(label.error);
+                core.error(label.error);
                 return;
             }
             // add the label
-            core_1.default.info("Adding label to PR");
+            core.info("Adding label to PR");
             const error = yield this.githubClient.addLabel(pr, [label.label]);
             if (error) {
-                core_1.default.error(error);
+                core.error(error);
                 return;
             }
-            core_1.default.setOutput("labels", labels.labels);
+            core.setOutput("labels", labels.labels);
         });
     }
 }

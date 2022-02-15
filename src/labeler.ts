@@ -1,6 +1,6 @@
 import { ConventionalCommit } from "./client/conventional_commit";
 import { GithubClient } from "./client/github";
-import core from "@actions/core";
+import * as core from "@actions/core";
 
 export class ConventionalLabeler {
   private githubClient: GithubClient;
@@ -20,7 +20,7 @@ export class ConventionalLabeler {
     core.info("Getting PR number");
     const pr = this.githubClient.getPr();
     if (!pr) {
-      core.error("No pull request found");
+      core.setFailed("No pull request found");
       return;
     }
 
@@ -28,7 +28,22 @@ export class ConventionalLabeler {
     core.info("Getting PR labels");
     const labels = await this.githubClient.getLabels(pr);
     if (labels.error) {
-      core.error(labels.error);
+      core.setFailed(labels.error);
+      return;
+    }
+
+    // get the pr title
+    const title = this.githubClient.getTitle();
+    if (!title || title.length === 0) {
+      core.setFailed("Failed to get the pr title");
+      return;
+    }
+
+    // get the label
+    core.info(`Getting conventional label from title ${title}`);
+    const generatedLabel = this.conventionalCommit.getLabel(title);
+    if (generatedLabel.error) {
+      core.setFailed(generatedLabel.error);
       return;
     }
 
@@ -37,37 +52,31 @@ export class ConventionalLabeler {
     const presetLabels = this.conventionalCommit.getValidLabels(
       labels.labels ?? []
     );
+
+    const differentLabels = this.conventionalCommit.getDiffLabels(
+      presetLabels,
+      [generatedLabel.label!]
+    );
+
     // remove them
-    core.info("Removing preset labels");
-    const removeError = await this.githubClient.removeLabels(pr, presetLabels);
+    core.info("Removing different label");
+    const removeError = await this.githubClient.removeLabels(
+      pr,
+      differentLabels
+    );
     if (removeError) {
-      core.error(removeError);
-      return;
-    }
-
-    // get the pr title
-    const title = this.githubClient.getTitle();
-    if (!title || title.length === 0) {
-      core.error("Failed to get the pr title");
-      return;
-    }
-
-    // get the label
-    core.info("Getting conventional label");
-    const label = this.conventionalCommit.getLabel(title);
-    if (label.error) {
-      core.error(label.error);
+      core.setFailed(removeError);
       return;
     }
 
     // add the label
-    core.info("Adding label to PR");
-    const error = await this.githubClient.addLabel(pr, [label.label!]);
+    core.info(`Adding label ${generatedLabel.label} to PR`);
+    const error = await this.githubClient.addLabel(pr, [generatedLabel.label!]);
     if (error) {
-      core.error(error);
+      core.setFailed(error);
       return;
     }
 
-    core.setOutput("labels", labels.labels);
+    core.setOutput("labels", generatedLabel.label);
   }
 }

@@ -1,4 +1,4 @@
-import github from "@actions/github";
+import * as github from "@actions/github";
 
 /**
  * Github client is a wrapper for the Github API.

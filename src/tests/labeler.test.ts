@@ -8,6 +8,7 @@ jest.mock("@actions/core", () => ({
   info: jest.fn(),
   error: jest.fn(),
   setOutput: jest.fn(),
+  setFailed: jest.fn(),
 }));
 
 jest.mock("@actions/github", () => ({
@@ -15,7 +16,7 @@ jest.mock("@actions/github", () => ({
     rest: {
       issues: {
         listLabelsOnIssue: jest.fn().mockReturnValue({
-          data: [{ name: "bugfix" }, { name: "enhancement" }],
+          data: [{ name: "bugfix" }],
         }),
         removeLabel: jest.fn().mockReturnValue({}),
         addLabels: jest.fn().mockReturnValue({}),
@@ -43,7 +44,7 @@ describe("Given a labeler client", () => {
     // clear mock calls
     (github.getOctokit as any).mockClear();
     (core.info as any).mockClear();
-    (core.error as any).mockClear();
+    (core.setFailed as any).mockClear();
   });
 
   it("should return the corresponding label for the commit title", async () => {
@@ -66,8 +67,8 @@ describe("Given a labeler client", () => {
       },
     });
     await client.label();
-    expect(core.error).toHaveBeenCalledTimes(1);
-    expect(core.error).toHaveBeenCalledWith("Error: add label error");
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith("Error: add label error");
   });
 
   it("Should remove labels with an error", async () => {
@@ -78,15 +79,18 @@ describe("Given a labeler client", () => {
             throw new Error("remove label error");
           }),
           listLabelsOnIssue: jest.fn().mockReturnValue({
-            data: [{ name: "bugfix" }, { name: "enhancement" }],
+            data: [
+              { name: "conventional: bugfix" },
+              { name: "conventional: enhancement" },
+            ],
           }),
           addLabels: jest.fn().mockReturnValue({}),
         },
       },
     });
     await client.label();
-    expect(core.error).toHaveBeenCalledTimes(1);
-    expect(core.error).toHaveBeenCalledWith("Error: remove label error");
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith("Error: remove label error");
   });
 
   it("should return the corresponding label with an error", async () => {
@@ -100,15 +104,15 @@ describe("Given a labeler client", () => {
       },
     });
     await client.label();
-    expect(core.error).toHaveBeenCalledTimes(1);
-    expect(core.error).toHaveBeenCalledWith("Error: issue error");
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith("Error: issue error");
   });
 
   it("should return the pr error", async () => {
     (github as any).context.payload.pull_request!.number = undefined;
     await client.label();
-    expect(core.error).toHaveBeenCalledTimes(1);
-    expect(core.error).toHaveBeenCalledWith("No pull request found");
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith("No pull request found");
   });
 
   it("should return the title error", async () => {
@@ -137,8 +141,8 @@ describe("Given a labeler client", () => {
     };
 
     await client.label();
-    expect(core.error).toHaveBeenCalledTimes(1);
-    expect(core.error).toHaveBeenCalledWith("Failed to get the pr title");
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith("Failed to get the pr title");
   });
 
   it("should return the title error", async () => {
@@ -167,7 +171,117 @@ describe("Given a labeler client", () => {
     };
 
     await client.label();
-    expect(core.error).toHaveBeenCalledTimes(1);
-    expect(core.error).toHaveBeenCalledWith("Invalid commit message");
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith(
+      "commit message [hello] does not follow the conventional commit format"
+    );
+  });
+});
+
+describe("Given a labeler with predifined labels", () => {
+  const client = new ConventionalLabeler();
+  const addLabels = jest.fn();
+  const removeLabels = jest.fn();
+
+  afterEach(() => {
+    addLabels.mockClear();
+    removeLabels.mockClear();
+  });
+
+  it("should return the corresponding label for the commit title", async () => {
+    (github.getOctokit as any).mockReturnValue({
+      rest: {
+        issues: {
+          addLabels: addLabels,
+          removeLabel: removeLabels,
+          listLabelsOnIssue: jest.fn().mockReturnValue({
+            data: [{ name: "bugfix" }],
+          }),
+        },
+      },
+    });
+    (github as any).context = {
+      repo: {
+        owner: "monalisa",
+        repo: "helloworld",
+      },
+      payload: {
+        pull_request: {
+          title: "fix: some bugs",
+          number: 123,
+        },
+      },
+    };
+    await client.label();
+    const addCalls = addLabels.mock.calls;
+
+    expect(addCalls.length).toBe(1);
+    expect(addCalls[0][0].labels).toStrictEqual(["conventional: bugfix"]);
+
+    expect(removeLabels).toHaveBeenCalledTimes(0);
+  });
+
+  it("should return the corresponding label for the commit title", async () => {
+    (github.getOctokit as any).mockReturnValue({
+      rest: {
+        issues: {
+          addLabels: addLabels,
+          removeLabel: removeLabels,
+          listLabelsOnIssue: jest.fn().mockReturnValue({
+            data: [{ name: "conventional: bugfix" }],
+          }),
+        },
+      },
+    });
+    (github as any).context = {
+      repo: {
+        owner: "monalisa",
+        repo: "helloworld",
+      },
+      payload: {
+        pull_request: {
+          title: "feat: some bugs",
+          number: 123,
+        },
+      },
+    };
+    await client.label();
+    const addCalls = addLabels.mock.calls;
+
+    expect(removeLabels).toHaveBeenCalledTimes(1);
+    expect(addCalls.length).toBe(1);
+    expect(addCalls[0][0].labels).toStrictEqual(["conventional: enhancement"]);
+  });
+
+  it("should return the corresponding label for the commit title", async () => {
+    (github.getOctokit as any).mockReturnValue({
+      rest: {
+        issues: {
+          addLabels: addLabels,
+          removeLabel: removeLabels,
+          listLabelsOnIssue: jest.fn().mockReturnValue({
+            data: [],
+          }),
+        },
+      },
+    });
+    (github as any).context = {
+      repo: {
+        owner: "monalisa",
+        repo: "helloworld",
+      },
+      payload: {
+        pull_request: {
+          title: "feat: some bugs",
+          number: 123,
+        },
+      },
+    };
+    await client.label();
+    const addCalls = addLabels.mock.calls;
+
+    expect(removeLabels).toHaveBeenCalledTimes(0);
+    expect(addCalls.length).toBe(1);
+    expect(addCalls[0][0].labels).toStrictEqual(["conventional: enhancement"]);
   });
 });
