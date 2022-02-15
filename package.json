@@ -23,6 +23,6 @@
     "coverage": "jest --coverage",
     "prebuild": "tsc",
     "build": "ncc build ./build/index.js -o dist",
-    "release": "release-it"
+    "release": "release-it --no-git.requireCleanWorkingDir"
   }
 }
