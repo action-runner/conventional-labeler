@@ -1,5 +1,9 @@
 name: 'Conventional Labeler'
 description: 'A Pull request labeler using conventional commit standard'
+branding:
+  icon: align-center
+  color: green
+
 inputs:
   access_token:
     description: Github Access Token to access and modify your pr's label
