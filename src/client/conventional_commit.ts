@@ -4,15 +4,15 @@
 export class ConventionalCommit {
   // map of conventional commit and its corresponding label
   map: { [key: string]: string } = {
-    feat: "enhancement",
-    fix: "bugfix",
-    docs: "documentation",
-    style: "style",
-    refactor: "refactor",
-    perf: "performance",
-    test: "test",
-    chore: "chore",
-    build: "build",
+    feat: "conventional: enhancement",
+    fix: "conventional: bugfix",
+    docs: "conventional: documentation",
+    style: "conventional: style",
+    refactor: "conventional: refactor",
+    perf: "conventional: performance",
+    test: "conventional: test",
+    chore: "conventional: chore",
+    build: "conventional: build",
   };
 
   /**
@@ -50,7 +50,7 @@ export class ConventionalCommit {
     // validate the commit message
     if (!this.validate(message)) {
       return {
-        error: "Invalid commit message",
+        error: "commit message does not follow the conventional commit format",
       };
     }
 

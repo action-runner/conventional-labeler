@@ -1,7 +1,12 @@
 name: Lint PR
-on: 
+on:
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
+    types:
+      - opened
+      - edited
+      - synchronize
 
 jobs:
   label:
