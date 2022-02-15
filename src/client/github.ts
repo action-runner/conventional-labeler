@@ -95,4 +95,29 @@ export class GithubClient {
   getPr(): number | undefined {
     return github.context.payload.pull_request?.number;
   }
+
+  /**
+   * Get list of commit messages
+   * @returns The commit messages or an error message
+   */
+  async getCommitMessages(
+    prNumber: number
+  ): Promise<{ commitMessages?: string[]; err?: string }> {
+    try {
+      const client = github.getOctokit(this.token);
+      const commits = await client.rest.pulls.listCommits({
+        repo: github.context.repo.repo,
+        owner: github.context.repo.owner,
+        pull_number: prNumber,
+      });
+
+      return {
+        commitMessages: commits.data.map((commit) => commit.commit.message),
+      };
+    } catch (e) {
+      return {
+        err: `${e}`,
+      };
+    }
+  }
 }

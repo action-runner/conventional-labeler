@@ -1,4 +1,3 @@
-import { GithubClient } from "../client/github";
 import core from "@actions/core";
 import github from "@actions/github";
 import { ConventionalLabeler } from "../labeler";
@@ -20,6 +19,11 @@ jest.mock("@actions/github", () => ({
         }),
         removeLabel: jest.fn().mockReturnValue({}),
         addLabels: jest.fn().mockReturnValue({}),
+      },
+      pulls: {
+        listCommits: jest.fn().mockReturnValue({
+          data: [{ commit: { message: "fix: add a new feature" } }],
+        }),
       },
     },
   }),
@@ -49,7 +53,7 @@ describe("Given a labeler client", () => {
 
   it("should return the corresponding label for the commit title", async () => {
     await client.label();
-    expect(core.info).toHaveBeenCalledTimes(6);
+    expect(core.info).toHaveBeenCalledTimes(7);
   });
 
   it("Should add label with an error", async () => {
@@ -62,6 +66,11 @@ describe("Given a labeler client", () => {
           removeLabel: jest.fn().mockReturnValue({}),
           listLabelsOnIssue: jest.fn().mockReturnValue({
             data: [{ name: "bugfix" }, { name: "enhancement" }],
+          }),
+        },
+        pulls: {
+          listCommits: jest.fn().mockReturnValue({
+            data: [{ commit: { message: "fix: add a new feature" } }],
           }),
         },
       },
@@ -85,6 +94,11 @@ describe("Given a labeler client", () => {
             ],
           }),
           addLabels: jest.fn().mockReturnValue({}),
+        },
+        pulls: {
+          listCommits: jest.fn().mockReturnValue({
+            data: [{ commit: { message: "fix: add a new feature" } }],
+          }),
         },
       },
     });
@@ -155,6 +169,9 @@ describe("Given a labeler client", () => {
             data: [{ name: "bugfix" }, { name: "enhancement" }],
           }),
         },
+        pulls: {
+          listCommits: jest.fn().mockReturnValue({ data: [] }),
+        },
       },
     });
     (github as any).context = {
@@ -165,6 +182,83 @@ describe("Given a labeler client", () => {
       payload: {
         pull_request: {
           title: "hello",
+          number: 123,
+        },
+      },
+    };
+
+    await client.label();
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith(
+      "title [hello] does not follow the conventional commit format"
+    );
+  });
+
+  it("should return the commit message error", async () => {
+    (github.getOctokit as any).mockReturnValue({
+      rest: {
+        issues: {
+          addLabels: jest.fn(),
+          removeLabel: jest.fn().mockReturnValue({}),
+          listLabelsOnIssue: jest.fn().mockReturnValue({
+            data: [{ name: "bugfix" }, { name: "enhancement" }],
+          }),
+        },
+        pulls: {
+          listCommits: jest
+            .fn()
+            .mockReturnValue({ data: [{ commit: { message: "fix: hell" } }] }),
+        },
+      },
+    });
+    (github as any).context = {
+      repo: {
+        owner: "monalisa",
+        repo: "helloworld",
+      },
+      payload: {
+        pull_request: {
+          title: "fix: hello",
+          number: 123,
+        },
+      },
+    };
+
+    await client.label();
+    expect(core.setFailed).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith(
+      "commit message [fix: hell] does not equal to the title of the PR [fix: hello]"
+    );
+  });
+
+  it("should return the commit message error", async () => {
+    (github.getOctokit as any).mockReturnValue({
+      rest: {
+        issues: {
+          addLabels: jest.fn(),
+          removeLabel: jest.fn().mockReturnValue({}),
+          listLabelsOnIssue: jest.fn().mockReturnValue({
+            data: [{ name: "bugfix" }, { name: "enhancement" }],
+          }),
+        },
+        pulls: {
+          listCommits: jest.fn().mockReturnValue({
+            data: [
+              { commit: { message: "fix: hello" } },
+              { commit: { message: "hello" } },
+            ],
+          }),
+        },
+      },
+    });
+    (github as any).context = {
+      repo: {
+        owner: "monalisa",
+        repo: "helloworld",
+      },
+      payload: {
+        pull_request: {
+          title: "fix: hello",
           number: 123,
         },
       },
@@ -196,6 +290,11 @@ describe("Given a labeler with predifined labels", () => {
           removeLabel: removeLabels,
           listLabelsOnIssue: jest.fn().mockReturnValue({
             data: [{ name: "bugfix" }],
+          }),
+        },
+        pulls: {
+          listCommits: jest.fn().mockReturnValue({
+            data: [{ commit: { message: "fix: some bugs" } }],
           }),
         },
       },
@@ -231,6 +330,11 @@ describe("Given a labeler with predifined labels", () => {
             data: [{ name: "conventional: bugfix" }],
           }),
         },
+        pulls: {
+          listCommits: jest.fn().mockReturnValue({
+            data: [{ commit: { message: "feat: some bugs" } }],
+          }),
+        },
       },
     });
     (github as any).context = {
@@ -261,6 +365,11 @@ describe("Given a labeler with predifined labels", () => {
           removeLabel: removeLabels,
           listLabelsOnIssue: jest.fn().mockReturnValue({
             data: [],
+          }),
+        },
+        pulls: {
+          listCommits: jest.fn().mockReturnValue({
+            data: [{ commit: { message: "feat: some bugs" } }],
           }),
         },
       },
