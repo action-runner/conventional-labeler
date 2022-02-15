@@ -12,6 +12,7 @@
         }
     },
     "git": {
-        "addUntrackedFiles": true
+        "addUntrackedFiles": true,
+        "requireCleanWorkingDir": true
     }
 }

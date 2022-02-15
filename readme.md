@@ -7,3 +7,18 @@ Conventional labeler will label your PR based on your PR's feature if it follows
 ## Required input
 
 - access_token: can be set by using `${{ secrets.GITHUB_TOKEN }}`
+
+## Example
+```yaml
+  label:
+    runs-on: ubuntu-latest
+    name: Lint PR
+    steps:
+      - name: label
+        uses: action-runner/conventional-labeler@v1
+        with:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get the output
+        run: echo "The labels were ${{ steps.label.outputs.labels }}"
+
+```
