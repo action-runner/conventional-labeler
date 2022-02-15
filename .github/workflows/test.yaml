@@ -42,7 +42,7 @@ jobs:
           git config --global user.name "github action"
       - run: yarn release
         env:
-          GH_TOKEN: ${{secrets.RELEASE_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.RELEASE_TOKEN}}
 
   
 
