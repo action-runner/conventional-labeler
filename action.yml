@@ -2,7 +2,7 @@ name: 'Conventional Labeler'
 description: 'A Pull request labeler using conventional commit standard'
 inputs:
   access_token:
-    description: 'Github Access Token to access and modify your pr's label'
+    description: Github Access Token to access and modify your pr's label
     required: true
 outputs:
   labels:

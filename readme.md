@@ -6,4 +6,4 @@ Conventional labeler will label your PR based on your PR's feature if it follows
 
 ## Required input
 
-- access_token: can be set by using ${{ secrets.GITHUB_TOKEN }}
+- access_token: can be set by using `${{ secrets.GITHUB_TOKEN }}`

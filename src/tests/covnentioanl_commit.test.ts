@@ -72,4 +72,36 @@ describe("Given a conventional commit client", () => {
     const labels = client.getValidLabels([]);
     expect(labels.length).toBe(0);
   });
+
+  it("Should return different labels", () => {
+    const diff = client.getDiffLabels(
+      ["enhancement", "bugfix"],
+      ["enhancement", "bugfix"]
+    );
+    expect(diff.length).toBe(0);
+  });
+
+  it("Should return different labels", () => {
+    const diff = client.getDiffLabels(
+      ["enhancement", "bug"],
+      ["enhancement", "bugfix"]
+    );
+    expect(diff).toEqual(["bug"]);
+  });
+
+  it("Should return different labels", () => {
+    const diff = client.getDiffLabels(
+      ["enhancement"],
+      ["enhancement", "bugfix"]
+    );
+    expect(diff.length).toEqual(0);
+  });
+
+  it("Should return different labels", () => {
+    const diff = client.getDiffLabels(
+      ["enhancement", "bug", "bugfix"],
+      ["enhancement", "bugfix"]
+    );
+    expect(diff).toEqual(["bug"]);
+  });
 });

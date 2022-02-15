@@ -1,5 +1,5 @@
 import { GithubClient } from "../client/github";
-import github from "@actions/github";
+import * as github from "@actions/github";
 
 jest.mock("@actions/core");
 jest.mock("@actions/github", () => ({

@@ -91,4 +91,17 @@ export class ConventionalCommit {
     }
     return validLabels;
   }
+
+  /**
+   * Given two labels array labels1 and labels2, return the labels that are not in labels2
+   */
+  getDiffLabels(labels: string[], labels2: string[]): string[] {
+    const diffLabels = [];
+    for (const label of labels) {
+      if (!labels2.includes(label)) {
+        diffLabels.push(label);
+      }
+    }
+    return diffLabels;
+  }
 }

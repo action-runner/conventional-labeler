@@ -1,0 +1,24 @@
+name: Lint PR
+on: 
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    name: A job to say hello
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+      - run: yarn
+      - run: yarn build
+      - name: label
+        uses: ./
+        with:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get the output
+        run: echo "The labels were ${{ steps.label.outputs.labels }}"
