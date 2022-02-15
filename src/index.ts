@@ -1,4 +1,6 @@
-import core from '@actions/core';
-import github from '@actions/github';
+import { ConventionalLabeler } from "./labeler";
 
-
+(async () => {
+  const labeler = new ConventionalLabeler();
+  await labeler.label();
+})();

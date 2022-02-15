@@ -8,5 +8,9 @@ module.exports = {
     "!src/**/*.d.ts",
     "!src/**/*.test.ts",
     "!src/**/*.stories.ts",
+  ],
+  testPathIgnorePatterns: [
+    "src/*.js",
+    "build/"
   ]
 };
