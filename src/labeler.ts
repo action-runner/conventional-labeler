@@ -39,7 +39,28 @@ export class ConventionalLabeler {
       return;
     }
 
-    // get the label
+    // get list of predefined labels
+    core.info("Getting predefined labels");
+    const predefinedLabels = this.conventionalCommit.getValidLabels(
+      labels.labels ?? []
+    );
+
+    // validate the commit message and title
+    core.info("Validating commit message and title");
+    const commitMessages = await this.githubClient.getCommitMessages(pr);
+    if (commitMessages.err) {
+      core.setFailed(commitMessages.err);
+    }
+    const validationError = this.conventionalCommit.validate(
+      commitMessages.commitMessages!,
+      title
+    );
+    if (validationError) {
+      core.setFailed(validationError);
+      return;
+    }
+
+    // get the generated label
     core.info(`Getting conventional label from title ${title}`);
     const generatedLabel = this.conventionalCommit.getLabel(title);
     if (generatedLabel.error) {
@@ -47,18 +68,12 @@ export class ConventionalLabeler {
       return;
     }
 
-    // get list of preset labels
-    core.info("Getting preset labels");
-    const presetLabels = this.conventionalCommit.getValidLabels(
-      labels.labels ?? []
-    );
-
     const differentLabels = this.conventionalCommit.getDiffLabels(
-      presetLabels,
+      predefinedLabels,
       [generatedLabel.label!]
     );
 
-    // remove them
+    // remove the labels that are not in the preset labels
     core.info("Removing different label");
     const removeError = await this.githubClient.removeLabels(
       pr,
@@ -69,7 +84,7 @@ export class ConventionalLabeler {
       return;
     }
 
-    // add the label
+    // add the generated label
     core.info(`Adding label ${generatedLabel.label} to PR`);
     const error = await this.githubClient.addLabel(pr, [generatedLabel.label!]);
     if (error) {

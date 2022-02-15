@@ -16,9 +16,11 @@ export class ConventionalCommit {
   };
 
   /**
-   * validate the pr title
+   * validate the message
+   * @param message commit message
+   * @returns true if the message is valid, false otherwise
    */
-  private validate(message: string): boolean {
+  private validateMessage(message: string): boolean {
     // list of conventional commit rules
     const rules = [
       {
@@ -48,7 +50,7 @@ export class ConventionalCommit {
     }
 
     // validate the commit message
-    if (!this.validate(message)) {
+    if (!this.validateMessage(message)) {
       return {
         error: `commit message [${message}] does not follow the conventional commit format`,
       };
@@ -103,5 +105,39 @@ export class ConventionalCommit {
       }
     }
     return diffLabels;
+  }
+
+  /**
+   * Validate commit messages based on the conventional commit format.
+   * The following rules will be applied:
+   * (1): If only one message and it is not equal to the title of the PR, return error
+   * (2): Otherwise, if the message is not in the conventional commit format, return error
+   *
+   * @param messages commit messages
+   * @returns an error message if the commit messages are not valid, otherwise return undefined
+   */
+  validate(messages: string[], title: string): string | undefined {
+    // Check if title meets the conventional commit format
+    if (!this.validateMessage(title)) {
+      return `title [${title}] does not follow the conventional commit format`;
+    }
+
+    if (messages.length === 0) {
+      return `commit message is empty`;
+    }
+
+    // if there is only one message, check if it is equal to the title of the PR
+    if (messages.length === 1 && messages[0] !== title) {
+      return `commit message [${messages[0]}] does not equal to the title of the PR [${title}]`;
+    }
+
+    // check if the commit messages are valid
+    for (const message of messages) {
+      if (!this.validateMessage(message)) {
+        return `commit message [${message}] does not follow the conventional commit format`;
+      }
+    }
+
+    return undefined;
   }
 }
