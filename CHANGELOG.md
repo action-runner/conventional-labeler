@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/action-runner/conventional-labeler/compare/1.1.0...1.1.1) (2022-02-15)
+
+
+### Bug Fixes
+
+* update release action ([a6babf6](https://github.com/action-runner/conventional-labeler/commit/a6babf6b2c3ad51d27fc286d4717e84633f20ff9))
+
 # 1.1.0 (2022-02-15)
 
 
