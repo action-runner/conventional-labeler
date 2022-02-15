@@ -26,7 +26,7 @@ jobs:
     - run: yarn test
 
   release:
-    if: ${{ (github.event.pusher.name != 'github action') && (github.ref == 'refs/heads/main') }}
+    if: ${{ (github.event.pusher.name != 'github action') && (github.ref == 'refs/heads/master') }}
     needs: [ test ]
     runs-on: ubuntu-latest
     steps:
