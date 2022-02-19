@@ -393,4 +393,41 @@ describe("Given a labeler with predifined labels", () => {
     expect(addCalls.length).toBe(1);
     expect(addCalls[0][0].labels).toStrictEqual(["conventional: enhancement"]);
   });
+
+  it("should return the corresponding label for the commit title", async () => {
+    (github.getOctokit as any).mockReturnValue({
+      rest: {
+        issues: {
+          addLabels: addLabels,
+          removeLabel: removeLabels,
+          listLabelsOnIssue: jest.fn().mockReturnValue({
+            data: [],
+          }),
+        },
+        pulls: {
+          listCommits: jest.fn().mockReturnValue({
+            data: [{ commit: { message: "feat: some bugs\n* some bugs" } }],
+          }),
+        },
+      },
+    });
+    (github as any).context = {
+      repo: {
+        owner: "monalisa",
+        repo: "helloworld",
+      },
+      payload: {
+        pull_request: {
+          title: "feat: some bugs",
+          number: 123,
+        },
+      },
+    };
+    await client.label();
+    const addCalls = addLabels.mock.calls;
+
+    expect(removeLabels).toHaveBeenCalledTimes(0);
+    expect(addCalls.length).toBe(1);
+    expect(addCalls[0][0].labels).toStrictEqual(["conventional: enhancement"]);
+  });
 });

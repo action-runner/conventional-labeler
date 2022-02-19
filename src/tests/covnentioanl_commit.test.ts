@@ -142,4 +142,9 @@ describe("Given a conventional commit client", () => {
       "commit message [fi: hello] does not follow the conventional commit format"
     );
   });
+
+  it("Should return no error", () => {
+    const error = client.validate(["fix: hello\n* a: fix error"], "fix: hello");
+    expect(error).toBeUndefined();
+  });
 });
