@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/action-runner/conventional-labeler/compare/1.2.0...1.3.0) (2022-02-19)
+
+
+### Bug Fixes
+
+* add more tests ([24d1163](https://github.com/action-runner/conventional-labeler/commit/24d11630a5aeec71615ec8daef5bf97b47b722d1))
+
+
+### Features
+
+* support multilines commit message ([13209e0](https://github.com/action-runner/conventional-labeler/commit/13209e00b317e7f3addc7a452235e20a4b4ac10c))
+
 # [1.2.0](https://github.com/action-runner/conventional-labeler/compare/1.1.1...1.2.0) (2022-02-15)
 
 

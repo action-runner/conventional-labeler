@@ -56,10 +56,11 @@ class ConventionalCommit {
         if (message.length === 0) {
             return { error: "commit message is empty" };
         }
+        const cleanedMessage = this.cleanMessage(message);
         // validate the commit message
-        if (!this.validateMessage(message)) {
+        if (!this.validateMessage(cleanedMessage)) {
             return {
-                error: `commit message [${message}] does not follow the conventional commit format`,
+                error: `commit message [${cleanedMessage}] does not follow the conventional commit format`,
             };
         }
         // get the label
@@ -105,6 +106,9 @@ class ConventionalCommit {
         }
         return diffLabels;
     }
+    cleanMessage(message) {
+        return message.split("\n")[0];
+    }
     /**
      * Validate commit messages based on the conventional commit format.
      * The following rules will be applied:
@@ -123,8 +127,8 @@ class ConventionalCommit {
             return `commit message is empty`;
         }
         // if there is only one message, check if it is equal to the title of the PR
-        if (messages.length === 1 && messages[0] !== title) {
-            return `commit message [${messages[0]}] does not equal to the title of the PR [${title}]`;
+        if (messages.length === 1 && this.cleanMessage(messages[0]) !== title) {
+            return `commit message [${this.cleanMessage(messages[0])}] does not equal to the title of the PR [${title}]`;
         }
         // check if the commit messages are valid
         for (const message of messages) {
