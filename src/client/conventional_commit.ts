@@ -4,15 +4,15 @@
 export class ConventionalCommit {
   // map of conventional commit and its corresponding label
   map: { [key: string]: string } = {
-    feat: "conventional: enhancement",
-    fix: "conventional: bugfix",
-    docs: "conventional: documentation",
-    style: "conventional: style",
-    refactor: "conventional: refactor",
-    perf: "conventional: performance",
-    test: "conventional: test",
-    chore: "conventional: chore",
-    build: "conventional: build",
+    feat: "enhancement",
+    fix: "bug",
+    docs: "documentation",
+    style: "style",
+    refactor: "refactor",
+    perf: "performance",
+    test: "test",
+    chore: "chore",
+    build: "build",
   };
 
   /**

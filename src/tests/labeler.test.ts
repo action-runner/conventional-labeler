@@ -88,10 +88,7 @@ describe("Given a labeler client", () => {
             throw new Error("remove label error");
           }),
           listLabelsOnIssue: jest.fn().mockReturnValue({
-            data: [
-              { name: "conventional: bugfix" },
-              { name: "conventional: enhancement" },
-            ],
+            data: [{ name: "bugfix" }, { name: "enhancement" }],
           }),
           addLabels: jest.fn().mockReturnValue({}),
         },
@@ -315,7 +312,7 @@ describe("Given a labeler with predifined labels", () => {
     const addCalls = addLabels.mock.calls;
 
     expect(addCalls.length).toBe(1);
-    expect(addCalls[0][0].labels).toStrictEqual(["conventional: bugfix"]);
+    expect(addCalls[0][0].labels).toStrictEqual(["bug"]);
 
     expect(removeLabels).toHaveBeenCalledTimes(0);
   });
@@ -327,7 +324,7 @@ describe("Given a labeler with predifined labels", () => {
           addLabels: addLabels,
           removeLabel: removeLabels,
           listLabelsOnIssue: jest.fn().mockReturnValue({
-            data: [{ name: "conventional: bugfix" }],
+            data: [{ name: "bug" }],
           }),
         },
         pulls: {
@@ -354,7 +351,7 @@ describe("Given a labeler with predifined labels", () => {
 
     expect(removeLabels).toHaveBeenCalledTimes(1);
     expect(addCalls.length).toBe(1);
-    expect(addCalls[0][0].labels).toStrictEqual(["conventional: enhancement"]);
+    expect(addCalls[0][0].labels).toStrictEqual(["enhancement"]);
   });
 
   it("should return the corresponding label for the commit title", async () => {
@@ -391,7 +388,7 @@ describe("Given a labeler with predifined labels", () => {
 
     expect(removeLabels).toHaveBeenCalledTimes(0);
     expect(addCalls.length).toBe(1);
-    expect(addCalls[0][0].labels).toStrictEqual(["conventional: enhancement"]);
+    expect(addCalls[0][0].labels).toStrictEqual(["enhancement"]);
   });
 
   it("should return the corresponding label for the commit title", async () => {
@@ -428,6 +425,6 @@ describe("Given a labeler with predifined labels", () => {
 
     expect(removeLabels).toHaveBeenCalledTimes(0);
     expect(addCalls.length).toBe(1);
-    expect(addCalls[0][0].labels).toStrictEqual(["conventional: enhancement"]);
+    expect(addCalls[0][0].labels).toStrictEqual(["enhancement"]);
   });
 });
