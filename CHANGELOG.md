@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/action-runner/conventional-labeler/compare/1.3.0...2.0.0) (2022-03-03)
+
+
+### Features
+
+* use github predefined label for labeling ([b4fe22b](https://github.com/action-runner/conventional-labeler/commit/b4fe22bd1faf4edb3a254a25b98ff3762a5bbe53))
+
+
+### BREAKING CHANGES
+
+* may overide existing labels
+
 # [1.3.0](https://github.com/action-runner/conventional-labeler/compare/1.2.0...1.3.0) (2022-02-19)
 
 
