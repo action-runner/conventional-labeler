@@ -10,13 +10,13 @@ describe("Given a conventional commit client", () => {
   it("should return the corresponding label for the commit title", () => {
     const label = client.getLabel("fix: add a new feature");
     expect(label.error).toBeUndefined();
-    expect(label.label).toEqual("conventional: bugfix");
+    expect(label.label).toEqual("bug");
   });
 
   it("should return the corresponding label for the commit title", () => {
     const message = "feat: add test";
     const label = client.getLabel(message);
-    expect(label.label).toEqual("conventional: enhancement");
+    expect(label.label).toEqual("enhancement");
   });
 
   it("should return an error if the commit title is invalid", () => {
@@ -34,28 +34,22 @@ describe("Given a conventional commit client", () => {
   });
 
   it("Should return true if the label is one of the predefined labels", () => {
-    const result = client.isConventionalLabel("conventional: enhancement");
+    const result = client.isConventionalLabel("enhancement");
     expect(result).toBeTruthy();
   });
 
   it("Should return false if the label is not one of the predefined labels", () => {
-    const result = client.isConventionalLabel("conventional: enhance");
+    const result = client.isConventionalLabel("enhance");
     expect(result).toBeFalsy();
   });
 
   it("Should return a list of invalid labels", () => {
-    const labels = client.getInvalidLabels([
-      "conventional: enhancement",
-      "conventional: enhance",
-    ]);
-    expect(labels).toEqual(["conventional: enhance"]);
+    const labels = client.getInvalidLabels(["enhancement", "enhance"]);
+    expect(labels).toEqual(["enhance"]);
   });
 
   it("Should return a list of invalid labels", () => {
-    const labels = client.getInvalidLabels([
-      "conventional: enhancement",
-      "conventional: bugfix",
-    ]);
+    const labels = client.getInvalidLabels(["enhancement", "bug"]);
     expect(labels.length).toBe(0);
   });
 
@@ -65,18 +59,12 @@ describe("Given a conventional commit client", () => {
   });
 
   it("Should return a list of valid labels", () => {
-    const labels = client.getValidLabels([
-      "conventional: enhancement",
-      "conventional: enhance",
-    ]);
-    expect(labels).toEqual(["conventional: enhancement"]);
+    const labels = client.getValidLabels(["enhancement", "enhance"]);
+    expect(labels).toEqual(["enhancement"]);
   });
 
   it("Should return a list of valid labels", () => {
-    const labels = client.getValidLabels([
-      "conventional: enhancement",
-      "conventional: bugfix",
-    ]);
+    const labels = client.getValidLabels(["enhancement", "bug"]);
     expect(labels.length).toBe(2);
   });
 
@@ -87,8 +75,8 @@ describe("Given a conventional commit client", () => {
 
   it("Should return different labels", () => {
     const diff = client.getDiffLabels(
-      ["enhancement", "bugfix"],
-      ["enhancement", "bugfix"]
+      ["enhancement", "bug"],
+      ["enhancement", "bug"]
     );
     expect(diff.length).toBe(0);
   });
@@ -96,25 +84,22 @@ describe("Given a conventional commit client", () => {
   it("Should return different labels", () => {
     const diff = client.getDiffLabels(
       ["enhancement", "bug"],
-      ["enhancement", "bugfix"]
+      ["enhancement", "bu"]
     );
     expect(diff).toEqual(["bug"]);
   });
 
   it("Should return different labels", () => {
-    const diff = client.getDiffLabels(
-      ["enhancement"],
-      ["enhancement", "bugfix"]
-    );
+    const diff = client.getDiffLabels(["enhancement"], ["enhancement", "bug"]);
     expect(diff.length).toEqual(0);
   });
 
   it("Should return different labels", () => {
     const diff = client.getDiffLabels(
-      ["enhancement", "bug", "bugfix"],
-      ["enhancement", "bugfix"]
+      ["enhancement", "bag", "bug"],
+      ["enhancement", "bug"]
     );
-    expect(diff).toEqual(["bug"]);
+    expect(diff).toEqual(["bag"]);
   });
 
   it("Should return an conventional commit error", () => {
