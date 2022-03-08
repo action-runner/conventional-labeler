@@ -14,6 +14,12 @@ describe("Given a conventional commit client", () => {
   });
 
   it("should return the corresponding label for the commit title", () => {
+    const label = client.getLabel("docs(etd-common): add a new documentation");
+    expect(label.error).toBeUndefined();
+    expect(label.label).toEqual("documentation");
+  });
+
+  it("should return the corresponding label for the commit title", () => {
     const message = "feat: add test";
     const label = client.getLabel(message);
     expect(label.label).toEqual("enhancement");
