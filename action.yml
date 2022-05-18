@@ -8,6 +8,10 @@ inputs:
   access_token:
     description: Github Access Token to access and modify your pr's label
     required: true
+  strict:
+    description: Validate all commit messages use conventional commit standard
+    required: false
+    default: "true"
 outputs:
   labels:
     description: Generated labels for your pull request.
