@@ -116,16 +116,24 @@ export class ConventionalCommit {
   /**
    * Validate commit messages based on the conventional commit format.
    * The following rules will be applied:
-   * (1): If only one message and it is not equal to the title of the PR, return error
-   * (2): Otherwise, if the message is not in the conventional commit format, return error
+   * (1): If not strict, messages won't be validated
+   * (2): Otherwise if only one message and it is not equal to the title of the PR, return error
+   * (3): Otherwise, if any message is not in the conventional commit format, return error
    *
    * @param messages commit messages
+   * @param title PR title
+   * @param strict whether strict message checking should apply
    * @returns an error message if the commit messages are not valid, otherwise return undefined
    */
-  validate(messages: string[], title: string): string | undefined {
+  validate(messages: string[], title: string, strict: boolean = true): string | undefined {
     // Check if title meets the conventional commit format
     if (!this.validateMessage(title)) {
       return `title [${title}] does not follow the conventional commit format`;
+    }
+
+    // If not in strict mode, no more work needs to be done
+    if (!strict) {
+      return undefined;
     }
 
     if (messages.length === 0) {
