@@ -5,11 +5,14 @@ import * as core from "@actions/core";
 export class ConventionalLabeler {
   private githubClient: GithubClient;
   private conventionalCommit: ConventionalCommit;
+  private strict: boolean;
 
   constructor() {
     const token = core.getInput("access_token", { required: true });
+
     this.githubClient = new GithubClient(token);
     this.conventionalCommit = new ConventionalCommit();
+    this.strict = core.getBooleanInput(token);
   }
 
   /**
@@ -53,7 +56,8 @@ export class ConventionalLabeler {
     }
     const validationError = this.conventionalCommit.validate(
       commitMessages.commitMessages!,
-      title
+      title,
+      this.strict
     );
     if (validationError) {
       core.setFailed(validationError);

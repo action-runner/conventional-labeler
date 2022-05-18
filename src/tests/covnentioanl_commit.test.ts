@@ -132,4 +132,9 @@ describe("Given a conventional commit client", () => {
     const error = client.validate(["fix: hello\n* a: fix error"], "fix: hello");
     expect(error).toBeUndefined();
   });
+
+  it("Should return no error when not strict", () => {
+    const error = client.validate(["hello", "fix error"], "fix: hello", false);
+    expect(error).toBeUndefined();
+  });
 });
