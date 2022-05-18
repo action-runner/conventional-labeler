@@ -13,6 +13,7 @@ export class ConventionalCommit {
     test: "test",
     chore: "chore",
     build: "build",
+    breaking: "breaking"
   };
 
   /**
@@ -26,7 +27,7 @@ export class ConventionalCommit {
       {
         name: "title",
         regex:
-          /^(feat|fix|docs|style|refactor|perf|test|chore|build)(\(([\w\s]+)\))?: /,
+          /^(feat|fix|docs|style|refactor|perf|test|chore|build)(?:\([\w\s]+\))?(!)?: /,
       },
     ];
 
@@ -60,10 +61,10 @@ export class ConventionalCommit {
 
     // get the label
     const match = message.match(
-      /^(feat|fix|docs|style|refactor|perf|test|chore|build)(\(([\w\s]+)\))?: /
+      /^(feat|fix|docs|style|refactor|perf|test|chore|build)(?:\([\w\s]+\))?(!)?: /
     );
 
-    const matchedLabel = match![1];
+    const matchedLabel = match![2] != null ? "breaking" : match![1];
     return {
       label: this.map[matchedLabel],
     };
