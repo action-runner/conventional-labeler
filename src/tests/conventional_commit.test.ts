@@ -22,7 +22,13 @@ describe("Given a conventional commit client", () => {
   it("should return the corresponding label for the commit title", () => {
     const label = client.getLabel("fix!: it is a breaking change");
     expect(label.error).toBeUndefined();
-    expect(label.label).toEqual("breaking");
+    expect(label.label).toEqual("bug!");
+  });
+
+  it("should return the corresponding label for the commit title", () => {
+    const label = client.getLabel("feat!: it is a breaking change");
+    expect(label.error).toBeUndefined();
+    expect(label.label).toEqual("enhancement!");
   });
 
   it("should return an error if the commit title is invalid", () => {

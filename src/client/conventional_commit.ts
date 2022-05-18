@@ -13,7 +13,6 @@ export class ConventionalCommit {
     test: "test",
     chore: "chore",
     build: "build",
-    breaking: "breaking"
   };
 
   /**
@@ -64,9 +63,10 @@ export class ConventionalCommit {
       /^(feat|fix|docs|style|refactor|perf|test|chore|build)(?:\([\w\s]+\))?(!)?: /
     );
 
-    const matchedLabel = match![2] != null ? "breaking" : match![1];
+    const matchedLabel = match![1];
+    const label = this.map[matchedLabel].concat(match![2] != null ? "!" : "");
     return {
-      label: this.map[matchedLabel],
+      label: label,
     };
   }
 
