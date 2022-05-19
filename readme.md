@@ -8,6 +8,10 @@ Conventional labeler will label your PR based on your PR's feature if it follows
 
 - access_token: can be set by using `${{ secrets.GITHUB_TOKEN }}`
 
+## Optional input
+
+- strict: can be set to validate commit messages in addition to the PR title; defaults to true
+
 ## Example
 ```yaml
   label:
@@ -18,6 +22,7 @@ Conventional labeler will label your PR based on your PR's feature if it follows
         uses: action-runner/conventional-labeler@v1
         with:
           access_token: ${{ secrets.GITHUB_TOKEN }}
+          strict: "true"
       - name: Get the output
         run: echo "The labels were ${{ steps.label.outputs.labels }}"
 

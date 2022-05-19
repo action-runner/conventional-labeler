@@ -26,7 +26,7 @@ export class ConventionalCommit {
       {
         name: "title",
         regex:
-          /^(feat|fix|docs|style|refactor|perf|test|chore|build)(\(([\w\s]+)\))?: /,
+          /^(feat|fix|docs|style|refactor|perf|test|chore|build)(?:\([\w\s]+\))?(!)?: /,
       },
     ];
 
@@ -41,9 +41,9 @@ export class ConventionalCommit {
   }
 
   /**
-   * Get the corresponding label for the commit title
+   * Get the corresponding labels for the commit title
    */
-  getLabel(message: string): { label?: string; error?: string } {
+  getLabels(message: string): { labels?: string[]; error?: string } {
     // if message is empty, return error
     if (message.length === 0) {
       return { error: "commit message is empty" };
@@ -60,12 +60,19 @@ export class ConventionalCommit {
 
     // get the label
     const match = message.match(
-      /^(feat|fix|docs|style|refactor|perf|test|chore|build)(\(([\w\s]+)\))?: /
+      /^(feat|fix|docs|style|refactor|perf|test|chore|build)(?:\([\w\s]+\))?(!)?: /
     );
 
     const matchedLabel = match![1];
+    const label = this.map[matchedLabel];
+    var labels = [label];
+
+    if (match![2] != null) {
+      labels.push("breaking");
+    }
+
     return {
-      label: this.map[matchedLabel],
+      labels: labels,
     };
   }
 
@@ -116,16 +123,24 @@ export class ConventionalCommit {
   /**
    * Validate commit messages based on the conventional commit format.
    * The following rules will be applied:
-   * (1): If only one message and it is not equal to the title of the PR, return error
-   * (2): Otherwise, if the message is not in the conventional commit format, return error
+   * (1): If not strict, messages won't be validated
+   * (2): Otherwise if only one message and it is not equal to the title of the PR, return error
+   * (3): Otherwise, if any message is not in the conventional commit format, return error
    *
    * @param messages commit messages
+   * @param title PR title
+   * @param strict whether strict message checking should apply
    * @returns an error message if the commit messages are not valid, otherwise return undefined
    */
-  validate(messages: string[], title: string): string | undefined {
+  validate(messages: string[], title: string, strict: boolean = true): string | undefined {
     // Check if title meets the conventional commit format
     if (!this.validateMessage(title)) {
       return `title [${title}] does not follow the conventional commit format`;
+    }
+
+    // If not in strict mode, no more work needs to be done
+    if (!strict) {
+      return undefined;
     }
 
     if (messages.length === 0) {
