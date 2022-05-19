@@ -4,6 +4,7 @@ import { ConventionalLabeler } from "../labeler";
 
 jest.mock("@actions/core", () => ({
   getInput: jest.fn().mockReturnValue("mock_token"),
+  getBooleanInput: jest.fn().mockReturnValue(true),
   info: jest.fn(),
   error: jest.fn(),
   setOutput: jest.fn(),
