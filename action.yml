@@ -14,7 +14,9 @@ inputs:
     default: "true"
 outputs:
   labels:
-    description: Generated labels for your pull request.
+    description: Generated space delimited labels for your pull request.
+  labels_list:
+    description: Generated labels for your pull request in list form.
 runs:
   using: 'node16'
   main: 'dist/index.js'

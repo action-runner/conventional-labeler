@@ -41,9 +41,9 @@ export class ConventionalCommit {
   }
 
   /**
-   * Get the corresponding label for the commit title
+   * Get the corresponding labels for the commit title
    */
-  getLabel(message: string): { label?: string; error?: string } {
+  getLabels(message: string): { labels?: string[]; error?: string } {
     // if message is empty, return error
     if (message.length === 0) {
       return { error: "commit message is empty" };
@@ -64,9 +64,15 @@ export class ConventionalCommit {
     );
 
     const matchedLabel = match![1];
-    const label = this.map[matchedLabel].concat(match![2] != null ? "!" : "");
+    const label = this.map[matchedLabel];
+    var labels = [label];
+
+    if (match![2] != null) {
+      labels.push("breaking");
+    }
+
     return {
-      label: label,
+      labels: labels,
     };
   }
 

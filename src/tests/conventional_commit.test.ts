@@ -7,50 +7,50 @@ describe("Given a conventional commit client", () => {
     client = new ConventionalCommit();
   });
 
-  it("should return the corresponding label for the commit title", () => {
-    const label = client.getLabel("fix: add a new feature");
-    expect(label.error).toBeUndefined();
-    expect(label.label).toEqual("bug");
+  it("should return the corresponding labels for the commit title", () => {
+    const labels = client.getLabels("fix: add a new feature");
+    expect(labels.error).toBeUndefined();
+    expect(labels.labels).toEqual(["bug"]);
   });
 
-  it("should return the corresponding label for the commit title", () => {
+  it("should return the corresponding labels for the commit title", () => {
     const message = "feat: add test";
-    const label = client.getLabel(message);
-    expect(label.label).toEqual("enhancement");
+    const labels = client.getLabels(message);
+    expect(labels.labels).toEqual(["enhancement"]);
   });
 
-  it("should return the corresponding label for the commit title", () => {
-    const label = client.getLabel("fix!: it is a breaking change");
-    expect(label.error).toBeUndefined();
-    expect(label.label).toEqual("bug!");
+  it("should return the corresponding labels for the commit title", () => {
+    const labels = client.getLabels("fix!: it is a breaking change");
+    expect(labels.error).toBeUndefined();
+    expect(labels.labels).toEqual(["bug","breaking"]);
   });
 
-  it("should return the corresponding label for the commit title", () => {
-    const label = client.getLabel("feat!: it is a breaking change");
-    expect(label.error).toBeUndefined();
-    expect(label.label).toEqual("enhancement!");
+  it("should return the corresponding labels for the commit title", () => {
+    const labels = client.getLabels("feat!: it is a breaking change");
+    expect(labels.error).toBeUndefined();
+    expect(labels.labels).toEqual(["enhancement","breaking"]);
   });
 
   it("should return an error if the commit title is invalid", () => {
     const message = "add test";
-    const label = client.getLabel(message);
-    expect(label.error).toBeDefined();
-    expect(label.label).toBeUndefined();
+    const labels = client.getLabels(message);
+    expect(labels.error).toBeDefined();
+    expect(labels.labels).toBeUndefined();
   });
 
   it("should return an error if the commit title is invalid", () => {
     const message = "";
-    const label = client.getLabel(message);
-    expect(label.error).toBe("commit message is empty");
-    expect(label.label).toBeUndefined();
+    const labels = client.getLabels(message);
+    expect(labels.error).toBe("commit message is empty");
+    expect(labels.labels).toBeUndefined();
   });
 
-  it("Should return true if the label is one of the predefined labels", () => {
+  it("Should return true if the labels is one of the predefined labels", () => {
     const result = client.isConventionalLabel("enhancement");
     expect(result).toBeTruthy();
   });
 
-  it("Should return false if the label is not one of the predefined labels", () => {
+  it("Should return false if the labels is not one of the predefined labels", () => {
     const result = client.isConventionalLabel("enhance");
     expect(result).toBeFalsy();
   });
