@@ -12,7 +12,7 @@ export class ConventionalLabeler {
 
     this.githubClient = new GithubClient(token);
     this.conventionalCommit = new ConventionalCommit();
-    this.strict = core.getBooleanInput(token);
+    this.strict = core.getBooleanInput("strict");
   }
 
   /**
